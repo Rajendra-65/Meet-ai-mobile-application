@@ -131,7 +131,7 @@ export const DashboardSidebar = () => {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter className = "text-white flex items-center m-auto ml-10">
+            <SidebarFooter className = "text-white flex items-center m-auto">
                 <DashboardUserButton/>
             </SidebarFooter>
         </Sidebar>
