@@ -49,7 +49,7 @@ export const DashboardUserButton = () => {
                         </Avatar>
                     ) : (<GeneratedAvatar
                         seed={data?.user?.name}
-                        variant="initials"
+                        variant="botttsNeutral"
                         className="size-9 mr-3"
                     />
                     )}
