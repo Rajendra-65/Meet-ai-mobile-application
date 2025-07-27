@@ -2,8 +2,7 @@ import React from 'react';
 import { headers } from 'next/headers';
 import { HomeView } from '@/modules/home/ui/views/home-view'
 import { auth } from '@/lib/auth'
-import { redirect } from 'next/navigation';
-import { DashboardSidebar } from '@/modules/dashboard/ui/components/dashboard-sidebar';
+import { redirect } from 'next/navigation'
 
 const page = async () => {
   const session = await auth.api.getSession({
@@ -16,7 +15,6 @@ const page = async () => {
 
   return (
     <>
-      <DashboardSidebar />
       <HomeView />
     </>
   )
