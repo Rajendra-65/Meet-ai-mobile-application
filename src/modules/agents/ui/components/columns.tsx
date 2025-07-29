@@ -35,8 +35,9 @@ export const columns : ColumnDef<AgentGetOne>[] = [
                     <div className = "flex items-center gap-x-1">
                         <CornerDownRightIcon className = "size-3 text-muted-foreground">
                             <span className = "text-sm text-muted-foreground truncate capitalize">
+                                
                                 {
-                                    row.original.instructions
+                                    row.original.meetingCount === 1 ? "meeting" : "meetings"
                                 }
                             </span>
                         </CornerDownRightIcon>
