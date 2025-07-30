@@ -68,14 +68,14 @@ export const AgentIdViewHeader = ({
                 <DropdownMenuContent align = "end">
                     <DropdownMenuItem 
                         onClick = {onEdit}
-                        className = "flex "
+                        className = "flex cursor-pointer"
                     >
                         <PencilIcon className = "size-4 text-black mt-1"/>
                         Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                         onClick = {onRemove}
-                        className = "flex"
+                        className = "flex cursor-pointer"
                     >
                         <TrashIcon className = "size-4 text-black mt-1"/>
                         Delete
