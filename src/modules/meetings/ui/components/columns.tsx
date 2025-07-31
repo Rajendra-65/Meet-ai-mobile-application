@@ -64,7 +64,7 @@ export const columns: ColumnDef<MeetingGetMany[number]>[] = [
                         <span
                             className="text-sm text-muted-foreground max-w-[200px] truncate capitalize"
                         >
-                            {row.original.agent.name}
+                            {row.original?.agent?.name}
                         </span>
                     </div>
                     <GeneratedAvatar
@@ -75,18 +75,6 @@ export const columns: ColumnDef<MeetingGetMany[number]>[] = [
                     <span>
                         {row.original.startedAt ? format(row.original.startedAt , "MMM d") : ""}
                     </span>
-                </div>
-                <div className="flex items-center gap-x-2">
-                    <div className="flex items-center gap-x-1">
-                        <CornerDownRightIcon className="size-3 text-muted-foreground">
-                            <span className="text-sm text-muted-foreground truncate capitalize">
-
-                                {
-                                    row.original.meetingCount === 1 ? "meeting" : "meetings"
-                                }
-                            </span>
-                        </CornerDownRightIcon>
-                    </div>
                 </div>
             </div>
         )
