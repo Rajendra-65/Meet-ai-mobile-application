@@ -1,7 +1,7 @@
-import {ReactNode, useState} from "react";
+import { Dispatch, ReactNode, SetStateAction } from "react";
 
 import { cn } from "@/lib/utils";
-import {Button} from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 
 import {
     CommandEmpty,
@@ -10,21 +10,23 @@ import {
     CommandList,
     CommandResponsiveDialog
 }
-from "@/components/ui/command";
+    from "@/components/ui/command";
 
 
 interface Props {
-    options : Array<{
-        id : string,
-        value : string,
-        children : ReactNode;
+    options: Array<{
+        id: string,
+        value: string,
+        children: ReactNode;
     }>
-    onSelect : (value : string) => void;
-    onSearch ? : (value : string) => void;
-    value : string;
-    placeholder? : string;
-    isSearchable ? : boolean;
-    className ? : string;
+    onSelect: (value: string) => void;
+    onSearch?: (value: string) => void;
+    value: string;
+    placeholder?: string;
+    open: boolean;
+    onOpenChange: Dispatch<SetStateAction<boolean>>;
+    isSearchable?: boolean;
+    className?: string;
 };
 
 export const CommandSelect = ({
@@ -33,53 +35,55 @@ export const CommandSelect = ({
     onSearch,
     value,
     placeholder,
-    className
-} : Props) => {
-    const [open,setOpen] = useState(false);
-    const selectedOption = options.find((option) => option.value === value)
+    className,
+    open,
+    onOpenChange,
+}: Props) => {
+    const selectedOption = options.find((option) => option.value === value);
 
-    return(
+    return (
         <>
             <Button
-                onClick={()=>setOpen(true)}
-                type = "button"
-                variant = "outline"
-                className = {cn(
+                onClick={() => onOpenChange(true)}
+                type="button"
+                variant="outline"
+                className={cn(
                     "h-9 justify-between font-normal px-2",
                     !selectedOption && "text-muted-forground",
                     className
                 )}
             >
-                <CommandResponsiveDialog
-                    open = {open}
-                    onOpenChange = {setOpen}
-                >
-                    <CommandInput
-                        placeholder = {placeholder || "Search...."}
-                        onValueChange = {onSearch}
-                    />
-                    <CommandList>
-                        <CommandEmpty>
-                            <span className = "text-muted-foreground tex-sm">
-                                No Options Found
-                            </span>
-                        </CommandEmpty>
-                        {
-                            options.map((option)=>(
-                                <CommandItem
-                                    key = {option.id}
-                                    onSelect = {()=>{
-                                        onSelect(option.value)
-                                        setOpen(false)
-                                    }}
-                                >
-                                    {option.children}
-                                </CommandItem>
-                            ))
-                        }
-                    </CommandList>
-                </CommandResponsiveDialog>
+                {selectedOption?.children ?? "Select option"}
             </Button>
+
+            <CommandResponsiveDialog
+                shouldFilter = {!onSearch}
+                open={open}
+                onOpenChange={onOpenChange}
+            >
+                <CommandInput
+                    placeholder={placeholder || "Search..."}
+                    onValueChange={onSearch}
+                />
+                <CommandList>
+                    <CommandEmpty>
+                        <span className="text-muted-foreground text-sm">
+                            No Options Found
+                        </span>
+                    </CommandEmpty>
+                    {options.map((option) => (
+                        <CommandItem
+                            key={option.id}
+                            onSelect={() => {
+                                onSelect(option.value);
+                                onOpenChange(false);
+                            }}
+                        >
+                            {option.children}
+                        </CommandItem>
+                    ))}
+                </CommandList>
+            </CommandResponsiveDialog>
         </>
-    )
-}
+    );
+};

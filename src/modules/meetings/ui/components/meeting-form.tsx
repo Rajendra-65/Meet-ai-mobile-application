@@ -11,6 +11,7 @@ import { GeneratedAvatar } from "@/components/generated-avatar";
 import {
     Form,
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -36,12 +37,13 @@ export const MeetingForm = ({
     const queryClient = useQueryClient();
 
     const [open,setOpen] = useState(false)
+    const [openNewAgentDialog, setNewOpenAgentDialog] = useState(false)
     const [agentSearch, setAgentSearch] = useState("");
 
     const agents = useQuery(
         trpc.agents.getMany.queryOptions({
-            pageSize : 100,
-            search : agentSearch
+            pageSize: 100,
+            search: agentSearch
         })
     )
 
@@ -124,7 +126,7 @@ export const MeetingForm = ({
                             <FormControl>
                                 <Input
                                     {...field}
-                                    placeholder = "e.g Math Consultations"
+                                    placeholder="e.g Math Consultations"
                                 />
                             </FormControl>
                             <FormMessage />
@@ -139,29 +141,41 @@ export const MeetingForm = ({
                             <FormLabel>Agent</FormLabel>
                             <FormControl>
                                 <CommandSelect
-                                    options = {
-                                        (agents.data?.items ?? []).map((agent)=>({
-                                            id : agent.id,
-                                            value : agent.name,
-                                            children : (
-                                                <div className = "flex items-center gap-x-2">
-                                                   <GeneratedAvatar
-                                                        seed = {agent.name}
-                                                        variant = "botttsNeutral"
-                                                        className = "border size-6"
+                                    open={open}
+                                    onOpenChange={setOpen} // Control dropdown
+                                    options={
+                                        (agents.data?.items ?? []).map((agent) => ({
+                                            id: agent.id,
+                                            value: agent.id, // ensure you're using agent.id for agentId
+                                            children: (
+                                                <div className="flex items-center gap-x-2">
+                                                    <GeneratedAvatar
+                                                        seed={agent.name}
+                                                        variant="botttsNeutral"
+                                                        className="border size-6"
                                                     />
                                                     <span>{agent.name}</span>
                                                 </div>
-                                            )
+                                            ),
                                         }))
                                     }
-
-                                    onSelect = {field.onChange}
-                                    onSearch = {setAgentSearch}
-                                    value = {field.value}
+                                    onSelect={(value) => {
+                                        field.onChange(value); // set form field
+                                        setOpen(false); // close dropdown
+                                    }}
+                                    onSearch={setAgentSearch}
+                                    value={field.value}
                                     placeholder="Select Agent"
                                 />
                             </FormControl>
+                            <FormDescription>
+                                Not Found what you&aps;re looking for ?
+                            </FormDescription>
+                            <Button
+                                type = "button"
+                                className = "text-primary hover:underline"
+                                onClick = {()=>setNewOpenAgentDialog(true)}
+                            />
                             <FormMessage />
                         </FormItem>
                     )}
