@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner";
 import { useState } from "react";
 import { CommandSelect } from "@/components/command-select";
+import { NewAgentDialog } from "@/modules/agents/ui/components/new-agent-dialog";
 
 interface MeetingFormProps {
     onSuccess?: (id: string) => void;
@@ -36,7 +37,7 @@ export const MeetingForm = ({
     // const router = useRouter();
     const queryClient = useQueryClient();
 
-    const [open,setOpen] = useState(false)
+    const [open, setOpen] = useState(false)
     const [openNewAgentDialog, setNewOpenAgentDialog] = useState(false)
     const [agentSearch, setAgentSearch] = useState("");
 
@@ -110,94 +111,99 @@ export const MeetingForm = ({
     }
 
     return (
-        <Form {...form}>
-            <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-                <GeneratedAvatar
-                    seed={form.watch("name")}
-                    variant="botttsNeutral"
-                    className="border size-16"
-                />
-                <FormField
-                    name="name"
-                    control={form.control}
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Name</FormLabel>
-                            <FormControl>
-                                <Input
-                                    {...field}
-                                    placeholder="e.g Math Consultations"
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    name="agentId"
-                    control={form.control}
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Agent</FormLabel>
-                            <FormControl>
-                                <CommandSelect
-                                    open={open}
-                                    onOpenChange={setOpen} // Control dropdown
-                                    options={
-                                        (agents.data?.items ?? []).map((agent) => ({
-                                            id: agent.id,
-                                            value: agent.id, // ensure you're using agent.id for agentId
-                                            children: (
-                                                <div className="flex items-center gap-x-2">
-                                                    <GeneratedAvatar
-                                                        seed={agent.name}
-                                                        variant="botttsNeutral"
-                                                        className="border size-6"
-                                                    />
-                                                    <span>{agent.name}</span>
-                                                </div>
-                                            ),
-                                        }))
-                                    }
-                                    onSelect={(value) => {
-                                        field.onChange(value); // set form field
-                                        setOpen(false); // close dropdown
-                                    }}
-                                    onSearch={setAgentSearch}
-                                    value={field.value}
-                                    placeholder="Select Agent"
-                                />
-                            </FormControl>
-                            <FormDescription>
-                                Not Found what you&aps;re looking for ?
-                            </FormDescription>
-                            <Button
-                                type = "button"
-                                className = "text-primary hover:underline"
-                                onClick = {()=>setNewOpenAgentDialog(true)}
-                            />
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <div
-                    className="flex justify-between gap-x-2"
-                >
-                    <Button
-                        variant="ghost"
-                        disabled={isPending}
-                        type="button"
-                        onClick={onCancel}
+        <>
+            <NewAgentDialog open = {openNewAgentDialog} onOpenChange = {setNewOpenAgentDialog} />
+            <Form {...form}>
+                <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+                    <GeneratedAvatar
+                        seed={form.watch("name")}
+                        variant="botttsNeutral"
+                        className="border size-16"
+                    />
+                    <FormField
+                        name="name"
+                        control={form.control}
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Name</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        placeholder="e.g Math Consultations"
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        name="agentId"
+                        control={form.control}
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Agent</FormLabel>
+                                <FormControl>
+                                    <CommandSelect
+                                        open={open}
+                                        onOpenChange={setOpen} // Control dropdown
+                                        options={
+                                            (agents.data?.items ?? []).map((agent) => ({
+                                                id: agent.id,
+                                                value: agent.id, // ensure you're using agent.id for agentId
+                                                children: (
+                                                    <div className="flex items-center gap-x-2">
+                                                        <GeneratedAvatar
+                                                            seed={agent.name}
+                                                            variant="botttsNeutral"
+                                                            className="border size-6"
+                                                        />
+                                                        <span>{agent.name}</span>
+                                                    </div>
+                                                ),
+                                            }))
+                                        }
+                                        onSelect={(value) => {
+                                            field.onChange(value); // set form field
+                                            setOpen(false); // close dropdown
+                                        }}
+                                        onSearch={setAgentSearch}
+                                        value={field.value}
+                                        placeholder="Select Agent"
+                                    />
+                                </FormControl>
+                                <FormDescription>
+                                    Not Found what you&apos;re looking for ?
+                                </FormDescription>
+                                <Button
+                                    type="button"
+                                    className="text-white hover:underline"
+                                    onClick={() => setNewOpenAgentDialog(true)}
+                                >
+                                    Create an Agent
+                                </Button>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <div
+                        className="flex justify-between gap-x-2"
                     >
-                        Cancel
-                    </Button>
+                        <Button
+                            variant="ghost"
+                            disabled={isPending}
+                            type="button"
+                            onClick={onCancel}
+                        >
+                            Cancel
+                        </Button>
 
-                    <Button disabled={isPending} type="submit">
-                        {isEdit ? "Update" : "Create"}
-                    </Button>
-                </div>
-            </form>
-        </Form>
+                        <Button disabled={isPending} type="submit">
+                            {isEdit ? "Update" : "Create"}
+                        </Button>
+                    </div>
+                </form>
+            </Form>
+        </>
     )
 
 }
