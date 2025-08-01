@@ -3,11 +3,11 @@ import {SearchIcon} from "lucide-react";
 import {Input} from "@/components/ui/input";
 
 import { useMeetingsFilters } from "../../hooks/use-meetings-filters";
-import { useState } from "react";
+
 
 export const MeetingsSearchFilter = () => {
     const [filters,setFilters] = useMeetingsFilters();
-    const [isDialogOpen , setisDialogOpen] = useState(false)
+
     return(
         <div className = "relative">
             <Input
