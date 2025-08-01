@@ -4,16 +4,18 @@ import React from 'react'
 interface Props {
     title: string;
     description: string;
+    image? : string;
 }
 
 export const EmptyState = ({
     title,
-    description
+    description,
+    image = "/meet-ai-assets/empty.svg"
 }: Props) => {
     return (
         <div className="py-4 px-8 flex flex-col items-center justify-center">
             <Image
-                src = "/logo.svg"
+                src = {image}
                 alt = "Empty"
                 width = {240}
                 height = {240}
