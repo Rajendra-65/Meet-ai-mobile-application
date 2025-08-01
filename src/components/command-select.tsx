@@ -1,4 +1,4 @@
-import { Dispatch, ReactNode, SetStateAction } from "react";
+import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button"
@@ -39,7 +39,13 @@ export const CommandSelect = ({
     open,
     onOpenChange,
 }: Props) => {
+    const [open1,setOpen1] = useState(false);
     const selectedOption = options.find((option) => option.value === value);
+
+    const handleOpenChange = (value:boolean) => {
+        onSearch?.("")
+        
+    }
 
     return (
         <>
@@ -59,7 +65,7 @@ export const CommandSelect = ({
             <CommandResponsiveDialog
                 shouldFilter = {!onSearch}
                 open={open}
-                onOpenChange={onOpenChange}
+                onOpenChange={handleOpenChange}
             >
                 <CommandInput
                     placeholder={placeholder || "Search..."}
