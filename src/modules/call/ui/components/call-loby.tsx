@@ -1,9 +1,10 @@
-import LogInIcon from "lucide-react";
+import {LogInIcon} from "lucide-react";
 import Link from "next/link";
 import {
     DefaultVideoPlaceholder,
     StreamVideoParticipant,
     StreamVideParticipant,
+    ToggleAudioPreviewButton,
     ToggleAUdioPreviewButton,
     ToggleVideoPreviewButton,
     useCallStateHooks,
@@ -73,6 +74,23 @@ export const CallLobby = ({onJoin} : Props) => {
                     : AllowBrowserPermission
                 }
             />
+            <div className = "flex gap-x-2">
+                <ToggleAudioPreviewButton />
+                <ToggleVideoPreviewButton />
+            </div>
+            <div className = "flex gap-x-2 justify-between w-full">
+                <Button asChild variant = "ghost">
+                    <Link href = "/meetings">
+                        Cancel
+                    </Link>
+                </Button>
+                <Button
+                    onClick = {onJoin}
+                >
+                    <LogInIcon/>
+                    Join Call
+                </Button>
+            </div>
         </div>
     )
 }
