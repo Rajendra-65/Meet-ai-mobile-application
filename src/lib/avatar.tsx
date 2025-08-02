@@ -1,5 +1,5 @@
 import { createAvatar } from "@dicebear/core";
-import {botttsNeutral, initials} from "@dicebar/collection";
+import { botttsNeutral , initials } from "@dicebear/collection";
 
 
 interface Props {
