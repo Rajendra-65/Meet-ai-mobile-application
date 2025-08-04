@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { agents, meetings } from "@/db/schema";
 import { streamVideo } from "@/lib/stream-video";
+import { inngest } from "@/ingest/client";
 
 function verifySignaturewithSDK(body: string, signature: string): boolean {
     return streamVideo.verifyWebhook(body, signature);
@@ -196,6 +197,14 @@ export async function POST(req: NextRequest) {
         }
 
         // Optionally enqueue background job
+
+        await inngest.send({
+            name : "meetings/processing",
+            data : {
+                meetingId : updatedMeeting.id,
+                transcriptUrl : updatedMeeting.transcriptUrl,
+            },
+        })
 
         return NextResponse.json({ status: "Ok" });
     }
