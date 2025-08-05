@@ -1,6 +1,6 @@
 import Markdown from "react-markdown";
 import Link from "next/link";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
 
@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { formatDuration } from "@/lib/utils";
+import { Transcript } from "./trasncript";
 
 interface Props {
   data: MeetingGetOne;
@@ -56,6 +57,7 @@ export const CompletedState = ({ data }: Props) => {
                 Ask AI
               </TabsTrigger>
             </TabsList>
+            <ScrollBar orientation = "horizontal"/>
           </ScrollArea>
         </div>
 
@@ -157,6 +159,10 @@ export const CompletedState = ({ data }: Props) => {
               </div>
             </div>
           </div>
+        </TabsContent>
+        
+        <TabsContent value = "transcript">
+          <Transcript meetingId = {data.id}/>
         </TabsContent>
       </Tabs>
     </div>
