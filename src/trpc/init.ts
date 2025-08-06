@@ -30,65 +30,66 @@ const t = initTRPC.create({
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const baseProcedure = t.procedure;
-export const protectedProcedure = baseProcedure.use(async({ctx,next})=>{
+export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
   const session = await auth.api.getSession({
-    headers : await headers(),
+    headers: await headers(),
   })
-  if(!session){
+  if (!session) {
     throw new TRPCError({
-      code : "UNAUTHORIZED",
-      message : "Unauthorized"
+      code: "UNAUTHORIZED",
+      message: "Unauthorized"
     })
   }
 
-  return next({ctx : {...ctx, auth : session}})
+  return next({ ctx: { ...ctx, auth: session } })
 })
 
-export const premiumProcedure = (entity : "meetings" | "agents") => {
-  protectedProcedure.use(async({ctx,next})=>{
-      const customer = await polarClient.customers.getStateExternal({
-        externalId : ctx.auth.user.id
-      })
-  
-  const [userMeetings] = await db
+export const premiumProcedure = (entity: "meetings" | "agents") => 
+
+  protectedProcedure.use(async ({ ctx, next }) => {
+    const customer = await polarClient.customers.getStateExternal({
+      externalId: ctx.auth.user.id
+    })
+
+    const [userMeetings] = await db
       .select({
-        count : count(meetings.id),
+        count: count(meetings.id),
       })
       .from(meetings)
       .where(eq(meetings.userId, ctx.auth.user.id));
 
-  const [userAgents] = await db
+    const [userAgents] = await db
       .select({
-        count : count(agents.id),
+        count: count(agents.id),
       })
       .from(agents)
-      .where(eq(agents.userId , ctx.auth.user.id))
+      .where(eq(agents.userId, ctx.auth.user.id))
 
     const isPremium = customer.activeSubscriptions.length > 0;
     const isFreeAgentLimitReached = userAgents.count >= MAX_FREE_AGENTS;
     const isFreeMeetingLimitReached = userMeetings.count >= MAX_FREE_MEETINGS;
-  
-    const shouldThrowMeetingError = 
+
+    const shouldThrowMeetingError =
       entity === "meetings" && isFreeMeetingLimitReached && !isPremium
- 
-    const shouldThrowAgentError = 
+
+    const shouldThrowAgentError =
       entity === "agents" && isFreeAgentLimitReached && !isPremium;
-    
-    if(shouldThrowMeetingError) {
+
+    if (shouldThrowMeetingError) {
       throw new TRPCError({
-        code : "FORBIDDEN",
-        message : "You have reached the maximum number of free meetings"
+        code: "FORBIDDEN",
+        message: "You have reached the maximum number of free meetings"
       })
     }
 
-    if(shouldThrowAgentError) {
+    if (shouldThrowAgentError) {
       throw new TRPCError({
-        code : "FORBIDDEN",
-        message : "You have reached the maximum number of free agents"
+        code: "FORBIDDEN",
+        message: "You have reached the maximum number of free agents"
       })
     }
 
-    return next({ctx : {...ctx, customer}})
-    
-    })
-}
+    return next({ ctx: { ...ctx, customer } })
+
+
+  })

@@ -54,6 +54,9 @@ export const MeetingForm = ({
                 await queryClient.invalidateQueries(
                     trpc.meetings.getMany.queryOptions({}),
                 );
+                await queryClient.invalidateQueries(
+                    trpc.premium.getFreeUsage.queryOptions()
+                )
                 // Invalidate free tier
                 onSuccess?.(data.id);
             },
@@ -78,7 +81,7 @@ export const MeetingForm = ({
                         })
                     )
                 }
-
+                // @ts-expect-error because of the id field
                 onSuccess?.(data?.id);
             },
             onError: (error) => {
