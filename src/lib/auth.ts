@@ -6,11 +6,13 @@ import * as schema from "@/db/schema";
 
 import { polarClient } from "./polar";
 
+
+
 export const auth = betterAuth({
     plugins : [
         polar ({
             client : polarClient,
-            createdCustomerOnSignUp : true,
+            createCustomerOnSignUp : true,
             use: [
                 checkout({
                     authenticatedUsersOnly : true,
