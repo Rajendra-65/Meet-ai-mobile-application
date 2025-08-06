@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { CommandSelect } from "@/components/command-select";
 import { NewAgentDialog } from "@/modules/agents/ui/components/new-agent-dialog";
+import { useRouter } from "next/navigation";
 
 interface MeetingFormProps {
     onSuccess?: (id: string) => void;
@@ -40,6 +41,7 @@ export const MeetingForm = ({
     const [open, setOpen] = useState(false)
     const [openNewAgentDialog, setNewOpenAgentDialog] = useState(false)
     const [agentSearch, setAgentSearch] = useState("");
+    const router = useRouter()
 
     const agents = useQuery(
         trpc.agents.getMany.queryOptions({
@@ -62,7 +64,10 @@ export const MeetingForm = ({
             },
             onError: (error) => {
                 toast.error(error.message)
-                // eroror code is forbidden then redirect to "/upgrade"
+                
+                if(error.data?.code === "FORBIDDEN") {
+                    router.push("/upgrade")
+                }
             }
         })
     )
@@ -86,7 +91,10 @@ export const MeetingForm = ({
             },
             onError: (error) => {
                 toast.error(error.message)
-                // eroror code is forbidden then redirect to "/upgrade"
+                
+                if(error.data?.code === "FORBIDDEN"){
+                    router.push("/upgrade")
+                }
             }
         })
     )

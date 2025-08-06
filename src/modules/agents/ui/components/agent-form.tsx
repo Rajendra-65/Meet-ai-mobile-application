@@ -19,6 +19,7 @@ import {
     FormMessage
 } from "@/components/ui/form";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface AgentFormProps {
     onSuccess ? : () => void;
@@ -32,7 +33,7 @@ export const AgentForm = ({
     initialValues,
 } : AgentFormProps) => {
     const trpc = useTRPC();
-    // const router = useRouter();
+    const router = useRouter();
     const queryClient = useQueryClient();
 
     const createAgent = useMutation(
@@ -70,7 +71,11 @@ export const AgentForm = ({
             onError : (error) => {
                 toast.error(error.message)
                 // eroror code is forbidden then redirect to "/upgrade"
+                if (error.data?.code === "FORBIDDEN") {
+                    router.push("/upgrade")
+                }
             }
+
         })
     )
 
