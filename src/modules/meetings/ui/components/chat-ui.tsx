@@ -51,6 +51,7 @@ export const ChatUI = ({
 
     useEffect(()=> {
         if(!client) return;
+        console.log("client found")
 
         const channel = client.channel("messaging",meetingId,{
             members : [userId]
@@ -74,7 +75,7 @@ export const ChatUI = ({
             <Chat client = {client}>
                 <Channel channel = {channel}>
                     <Window>
-                        <div className = "flex-1 overflow-y-auto max-h-[calc(100vh23rem)] border-b">
+                        <div className = "flex-1 overflow-y-auto max-h-[calc(100vh-23rem)] border-b-2">
                             <MessageList/>
                         </div>
                         <MessageInput/>

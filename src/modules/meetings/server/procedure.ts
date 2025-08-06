@@ -13,12 +13,21 @@ import JSONL from "jsonl-parse-stringify";
 import { streamChat } from "@/lib/stream-chat";
 
 export const meetingsRouter = createTRPCRouter({
-    generateChatToken : protectedProcedure.mutation(async({ctx}) => {
-        const token = streamChat.createToken(ctx.auth.user.id);
+    generateChatToken: protectedProcedure.mutation(async ({ ctx }) => {
+        const userId = ctx.auth.user.id;
+        const userName = ctx.auth.user.name ?? "User";
+        const userImage = ctx.auth.user.image ?? undefined;
+
+        // ✅ Ensure user exists BEFORE creating token
         await streamChat.upsertUser({
-            id : ctx.auth.user.id,
-            role : "admin"
-        })
+            id: userId,
+            name: userName,
+            image: userImage,
+            role: "admin",
+        });
+
+        const token = streamChat.createToken(userId);
+        return token;
     }),
     getTranscript: protectedProcedure
         .input(z.object({
@@ -79,27 +88,27 @@ export const meetingsRouter = createTRPCRouter({
                         ...agent
                     }))
                 );
-            
-            const speakers = [...userSpeakers , ...agentSpeakers]
-        
+
+            const speakers = [...userSpeakers, ...agentSpeakers]
+
             const transcriptWithSpeakers = transcript.map((item) => {
                 const speaker = speakers.find(
                     (speaker) => speaker.id === item.speaker_id
                 )
 
                 const usableSpeaker = {
-                    ... speaker,
-                    image : userSpeakers[0].image
+                    ...speaker,
+                    image: userSpeakers[0].image
                 }
 
-                if(!speaker) {
+                if (!speaker) {
                     return {
                         ...item,
-                        user : {
-                            name : "unknown",
-                            image : generatedAvatarUri({
-                                seed : "Unknown",
-                                variant : "initials"
+                        user: {
+                            name: "unknown",
+                            image: generatedAvatarUri({
+                                seed: "Unknown",
+                                variant: "initials"
                             })
                         }
                     }
@@ -107,9 +116,9 @@ export const meetingsRouter = createTRPCRouter({
 
                 return {
                     ...item,
-                    user : {
-                        name : speaker.name,
-                        image : usableSpeaker.image
+                    user: {
+                        name: speaker.name,
+                        image: usableSpeaker.image
                     },
                 }
             })

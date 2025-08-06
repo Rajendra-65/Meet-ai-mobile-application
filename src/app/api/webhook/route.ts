@@ -1,6 +1,9 @@
-import { and, eq, not } from "drizzle-orm";
+import OpenAI from "openai"
 
+import { and, eq, not } from "drizzle-orm";
+import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import {
+    MessageNewEvent,
     CallEndedEvent,
     CallTranscriptionReadyEvent,
     CallRecordingReadyEvent,
@@ -14,6 +17,12 @@ import { db } from "@/db";
 import { agents, meetings } from "@/db/schema";
 import { streamVideo } from "@/lib/stream-video";
 import { inngest } from "@/ingest/client";
+import { generatedAvatarUri } from "@/lib/avatar";
+import { streamChat } from "@/lib/stream-chat";
+
+const openAIClient = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEYS!
+})
 
 function verifySignaturewithSDK(body: string, signature: string): boolean {
     return streamVideo.verifyWebhook(body, signature);
@@ -127,7 +136,7 @@ export async function POST(req: NextRequest) {
         } catch (e) {
             console.log(e)
             return NextResponse.json({
-                status : "Failed"
+                status: "Failed"
             })
         }
     }
@@ -199,10 +208,10 @@ export async function POST(req: NextRequest) {
         // Optionally enqueue background job
 
         await inngest.send({
-            name : "meetings/processing",
-            data : {
-                meetingId : updatedMeeting.id,
-                transcriptUrl : updatedMeeting.transcriptUrl,
+            name: "meetings/processing",
+            data: {
+                meetingId: updatedMeeting.id,
+                transcriptUrl: updatedMeeting.transcriptUrl,
             },
         })
 
@@ -221,7 +230,109 @@ export async function POST(req: NextRequest) {
             .where(eq(meetings.id, meetingId));
 
         return NextResponse.json({ status: "Ok" });
+    } else if (eventType === "message.new") {
+        const event = payload as MessageNewEvent;
+
+        const userId = event.user?.id;
+        const channelId = event.channel_id;
+        const text = event.message?.text;
+
+        console.log("New message event received:", { userId, channelId, text });
+
+        if (!userId || !channelId || !text?.trim()) {
+            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        }
+
+        const [existingMeeting] = await db
+            .select()
+            .from(meetings)
+            .where(and(eq(meetings.id, channelId), eq(meetings.status, "completed")));
+
+        if (!existingMeeting) {
+            return NextResponse.json({ error: "Meeting not found" }, { status: 404 });
+        }
+
+        const [existingAgent] = await db
+            .select()
+            .from(agents)
+            .where(eq(agents.id, existingMeeting.agentId));
+
+        if (!existingAgent) {
+            return NextResponse.json({ error: "Agent not found" }, { status: 404 });
+        }
+
+        // ❌ Don't respond to messages sent by the agent
+        if (userId === existingAgent.id) {
+            return NextResponse.json({ message: "Ignored agent message" }, { status: 200 });
+        }
+
+        const instructions = `
+You are an AI assistant helping the user revisit a recently completed meeting.
+Below is a summary of the meeting:
+
+${existingMeeting.summary}
+
+Original instructions for you:
+
+${existingAgent.instructions}
+
+The user may ask questions about the meeting, request clarifications, or ask for follow-up actions.
+Always base your responses on the summary above.
+
+Also consider previous conversation context. Be helpful and concise.
+If the summary doesn't answer the question, say so politely.
+  `.trim();
+
+        const channel = streamChat.channel("messaging", channelId);
+        await channel.watch();
+
+        const previousMessages = channel.state.messages
+            .slice(-5)
+            .filter((msg) => msg.text && msg.text.trim() !== "")
+            .map<ChatCompletionMessageParam>((msg) => ({
+                role: msg.user?.id === existingAgent.id ? "assistant" : "user",
+                content: msg.text || "",
+            }));
+
+        const openAIResponse = await openAIClient.chat.completions.create({
+            model: "gpt-4o",
+            messages: [
+                { role: "system", content: instructions },
+                ...previousMessages,
+                { role: "user", content: text },
+            ],
+        });
+
+        const reply = openAIResponse.choices[0].message.content;
+
+        if (!reply) {
+            return NextResponse.json({ error: "No response from OpenAI" }, { status: 400 });
+        }
+
+        const avatarUrl = generatedAvatarUri({
+            seed: existingAgent.name,
+            variant: "botttsNeutral",
+        });
+
+        // ✅ Ensure agent is upserted BEFORE sending message
+        await streamChat.upsertUser({
+            id: existingAgent.id,
+            name: existingAgent.name,
+            image: avatarUrl,
+        });
+
+        await channel.sendMessage({
+            text: reply,
+            user: {
+                id: existingAgent.id,
+                name: existingAgent.name,
+                image: avatarUrl,
+            },
+        });
+
+        return NextResponse.json({ message: "AI response sent" }, { status: 200 });
     }
+
 
     // Default response for unknown/unhandled event types
     return NextResponse.json({ status: "Ok" });
