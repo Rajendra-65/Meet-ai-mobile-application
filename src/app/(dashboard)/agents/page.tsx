@@ -11,16 +11,16 @@ import { AgentsListHeader } from "@/modules/agents/ui/components/agents-list-hea
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { SearchParams } from "nuqs";
+import type { SearchParams } from "nuqs";
 import { loadSearchParams } from "@/modules/agents/params";
 
 interface Props {
-    SearchParams : Promise<SearchParams>
+    searchParams : Promise<SearchParams>
 }
 
-const Page = async ({SearchParams} : Props) => {
+const Page = async ({searchParams} : Props) => {
 
-    const filters = await loadSearchParams(SearchParams)
+    const filters = await loadSearchParams(searchParams)
 
     const session = await auth.api.getSession({
         headers : await headers()
@@ -58,4 +58,4 @@ const Page = async ({SearchParams} : Props) => {
     )
 }
 
-export default Page
+export default Page;
