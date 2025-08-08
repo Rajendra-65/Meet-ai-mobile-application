@@ -3,11 +3,10 @@ import {SearchIcon} from "lucide-react";
 import {Input} from "@/components/ui/input";
 
 import { useAgentsFilters } from "../../hooks/use-agents-filters";
-import { useState } from "react";
+
 
 export const SearchFilter = () => {
     const [filters,setFilters] = useAgentsFilters();
-    const [isDialogOpen , setisDialogOpen] = useState(false)
     return(
         <div className = "relative">
             <Input

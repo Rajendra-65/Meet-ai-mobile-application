@@ -3,9 +3,7 @@ import Link from "next/link";
 import {
     DefaultVideoPlaceholder,
     StreamVideoParticipant,
-    StreamVideParticipant,
     ToggleAudioPreviewButton,
-    ToggleAUdioPreviewButton,
     ToggleVideoPreviewButton,
     useCallStateHooks,
     VideoPreview,
