@@ -2,7 +2,7 @@ import { ErrorState } from '@/components/error-state';
 import { LoadingState } from '@/components/loading-state';
 import { auth } from '@/lib/auth';
 import { loadSearchParams } from '@/modules/agents/params';
-import { SearchParams } from 'nuqs/server';
+import type { SearchParams } from 'nuqs';
 import { MeetingsListHeader } from '@/modules/meetings/ui/components/meetings-list-header';
 import { MeetingsView } from '@/modules/meetings/ui/views/meetings-view'
 import { getQueryClient, trpc } from '@/trpc/server'
