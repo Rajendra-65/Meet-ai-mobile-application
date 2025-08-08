@@ -18,17 +18,17 @@ const pricingCardVariants = cva("rounded-lg p-4 py-6 w-full",{
     }
 })
 
-// const pricingCardIconVariants = cva("size-5",{
-//     variants : {
-//         variant : {
-//             default : "fill-primary text-white",
-//             highlighted : "fill-white text-black",
-//         },
-//     },
-//     defaultVariants : {
-//         variant : "default"
-//     }
-// })
+const pricingCardIconVariants = cva("size-5",{
+    variants : {
+        variant : {
+            default : "fill-primary text-white",
+            highlighted : "fill-white text-black",
+        },
+    },
+    defaultVariants : {
+        variant : "default"
+    }
+})
 
 const pricingCardSecondaryTextVariants = cva("text-neutal-700",{
     variants : {
@@ -159,7 +159,7 @@ export const PricingCard = ({
                                 className = "flex items-center gap-x-2.5"
                             >
                                 <CircleCheckIcon
-                                    className = {cn(pricingCardVariants({variant}))}
+                                    className = {cn(pricingCardIconVariants({variant}))}
                                 />
                                 {feature}
                             </li>

@@ -39,7 +39,7 @@ export const UpgradeView = () => {
                             products.map((product) => {
                                 const isCurrentProduct = currentSubscription?.id === product.id;
                                 const isPremium = !!currentSubscription;
-
+                                console.log(product)
                                 let buttonText = "Upgrade";
                                 let onClick = () =>
                                     authClient.checkout({
